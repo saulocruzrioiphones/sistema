@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rio iPhones · Sistema Interno</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #222222;
+  --border: #2e2e2e;
+  --text: #f0ede8;
+  --muted: #888;
+  --gold: #f0b429;
+  --gold-dim: rgba(240,180,41,0.12);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.12);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+header { background: #111; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; align-items: center; position: sticky; top: 0; z-index: 200; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--text); padding: 18px 0; margin-right: 32px; white-space: nowrap; }
+.logo span { color: var(--gold); }
+nav { display: flex; gap: 0; flex: 1; overflow-x: auto; }
+.nav-tab { padding: 0 20px; height: 58px; display: flex; align-items: center; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s, border-color 0.15s; user-select: none; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; padding-left: 24px; }
+.sync-status { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); white-space: nowrap; }
+.btn-sync { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.72rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-sync:hover { border-color: var(--gold); color: var(--gold); }
+main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+.section { display: none; }
+.section.active { display: block; }
+.page-header { margin-bottom: 24px; }
+.page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 4px; }
+.page-sub { font-size: 0.82rem; color: var(--muted); }
+.alert { background: var(--gold-dim); border: 1px solid rgba(240,180,41,0.3); border-radius: 10px; padding: 14px 18px; font-size: 0.82rem; color: var(--gold); margin-bottom: 24px; line-height: 1.6; }
+.alert strong { font-weight: 600; }
+.loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.82rem; color: var(--muted); }
+.error-box { background: var(--red-dim); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 16px 20px; font-size: 0.82rem; color: var(--red); line-height: 1.6; }
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.search-input { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 0.8rem; font-family: 'Inter', sans-serif; color: var(--text); outline: none; width: 200px; transition: border-color 0.2s; }
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--gold); }
+.filter-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-size: 0.75rem; font-weight: 500; cursor: pointer; color: var(--muted); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+.filter-btn:hover { color: var(--text); border-color: #555; }
+.filter-btn.active { background: var(--gold); color: #111; border-color: var(--gold); font-weight: 600; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.cat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: border-color 0.2s, transform 0.15s; }
+.cat-card:hover { border-color: #444; transform: translateY(-2px); }
+.cat-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.cat-model { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.2; }
+.cat-storage { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+.type-badge { font-size: 0.62rem; font-family: 'JetBrains Mono', monospace; font-weight: 500; padding: 3px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; margin-left: 8px; }
+.tb-iphone { background: var(--green-dim); color: var(--green); }
+.tb-macbook { background: var(--blue-dim); color: var(--blue); }
+.tb-ipad { background: var(--orange-dim); color: var(--orange); }
+.tb-watch { background: rgba(200,80,255,0.12); color: #c084fc; }
+.cat-price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--gold); margin-bottom: 10px; }
+.cat-row { font-size: 0.75rem; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+.cat-row span { color: var(--text); }
+.troca-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: #222; color: var(--muted); padding: 11px 16px; text-align: left; font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; border-bottom: 1px solid var(--border); }
+tbody tr { border-bottom: 1px solid #1e1e1e; transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #1f1f1f; }
+td { padding: 11px 16px; font-size: 0.82rem; vertical-align: middle; }
+td:first-child { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem; }
+.val-a { color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.val-b { color: var(--gold); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+.val-c { color: var(--red); font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.75rem; line-height: 1.6; }
+.obs-cell { font-size: 0.72rem; color: var(--muted); line-height: 1.5; max-width: 200px; }
+.legend { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--muted); }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+.checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cl-group { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.cl-group-title { background: #222; padding: 12px 18px; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+.cl-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 18px; border-bottom: 1px solid #1e1e1e; cursor: pointer; transition: background 0.12s; user-select: none; }
+.cl-item:last-child { border-bottom: none; }
+.cl-item:hover { background: #1f1f1f; }
+.cl-item.done { opacity: 0.45; }
+.cl-item.done .cl-text { text-decoration: line-through; }
+.cl-box { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid #444; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.cl-item.done .cl-box { background: var(--green); border-color: var(--green); }
+.cl-text { font-size: 0.82rem; line-height: 1.4; }
+.cl-note { font-size: 0.71rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 20px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.progress-bar { flex: 1; height: 6px; background: #2a2a2a; border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width 0.3s; }
+.progress-label { font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); white-space: nowrap; }
+.btn-reset { padding: 6px 14px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.75rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.15s; }
+.btn-reset:hover { border-color: var(--red); color: var(--red); }
+@media (max-width: 700px) {
+  .checklist-grid { grid-template-columns: 1fr; }
+  .cat-grid { grid-template-columns: 1fr 1fr; }
+  .nav-tab { padding: 0 12px; font-size: 0.68rem; }
+  header { padding: 0 14px; }
+  main { padding: 20px 14px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Rio <span>iPhones</span></div>
+  <nav>
+    <div class="nav-tab active" onclick="showSection('catalogo', this)">📦 Catálogo</div>
+    <div class="nav-tab" onclick="showSection('semi', this)">🔄 Seminovos</div>
+    <div class="nav-tab" onclick="showSection('troca', this)">💱 Tabela de Troca</div>
+    <div class="nav-tab" onclick="showSection('checklist', this)">✅ Checklist</div>
+  </nav>
+  <div class="header-right">
+    <span class="sync-status" id="sync-status">Carregando...</span>
+    <button class="btn-sync" onclick="loadAllData()">↺ Atualizar</button>
+  </div>
+</header>
+<main>
+<section id="catalogo" class="section active">
+  <div class="page-header">
+    <div class="page-title">Catálogo — Lacrados, MacBook, iPad & Watch</div>
+    <div class="page-sub">Dados carregados do Google Sheets · edite lá e clique em Atualizar</div>
+  </div>
+  <div class="filter-bar">
+    <input class="search-input" type="text" placeholder="Buscar modelo..." oninput="filterCat(this.value)" />
+    <button class="filter-btn active" onclick="setCatFiltro('todos',this)">Todos</button>
+    <button class="filter-btn" onclick="setCatFiltro('iPhone',this)">iPhone</button>
+    <button class="filter-btn" onclick="setCatFiltro('MacBook',this)">MacBook</button>
+    <button class="filter-btn" onclick="setCatFiltro('iPad',this)">iPad</button>
+    <button class="filter-btn" onclick="setCatFiltro('Watch',this)">Watch</button>
+  </div>
+  <div id="catalogo-content"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Buscando dados...</div></div></div>
+</section>
+<section id="semi" class="section">
+  <div class="page-header">
+    <div class="page-title">Tabela de Seminovos</div>
+    <div class="page-sub">Preços de venda · edite no Google Sheets e clique em Atualizar</div>
+  </div>
+  <div id="semi-content"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Buscando dados...</div></div></div>
+</section>
+<section id="troca" class="section">
+  <div class="page-header">
+    <div class="page-title">Tabela Base de Troca</div>
+    <div class="page-sub">Valores de referência para entrada de seminovos</div>
+  </div>
+  <div class="alert">
+    ⚠️ <strong>Sempre passar a cotação para o Júnior antes de confirmar.</strong><br>
+    📌 Ficar sempre em cima do cliente durante a avaliação.<br>
+    💡 Se o cliente pedir desconto, podemos subir até <strong>R$ 100</strong> na cotação.
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div><strong style="color:var(--green)">A</strong> — Bonito, pequenas marcas, bateria para trocar</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div><strong style="color:var(--gold)">B</strong> — Ok, algumas marcas, bateria para trocar</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div><strong style="color:var(--red)">C</strong> — Trincado (tela/traseira)</div>
+  </div>
+  <div id="troca-content"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Buscando dados...</div></div></div>
+</section>
+<section id="checklist" class="section">
+  <div class="page-header">
+    <div class="page-title">Checklist de Avaliação</div>
+    <div class="page-sub">O que verificar no celular na hora da troca</div>
+  </div>
+  <div class="checklist-grid" id="cl-grid"></div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="prog-label">0 / 0</div>
+    <button class="btn-reset" onclick="resetChecklist()">↺ Nova avaliação</button>
+  </div>
+</section>
+</main>
+<script>
+const SHEET_ID = '13sw23-k6M9c2GHjvseRLAmgQM7eoWpL_igSTrqNybv4';
+const ABAS = { catalogo: 'Catalogo', semi: 'Seminovos', troca: 'Troca' };
+function sheetUrl(aba) { return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(aba)}`; }
+async function fetchSheet(aba) {
+  const res = await fetch(sheetUrl(aba));
+  const text = await res.text();
+  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+  const cols = json.table.cols.map(c => c.label);
+  return (json.table.rows || []).map(r => Object.fromEntries(cols.map((c, i) => [c, r.c[i]?.v ?? ''])));
+}
+let catData = [], catFiltro = 'todos', catSearch = '';
+const typeClass = { iPhone: 'tb-iphone', MacBook: 'tb-macbook', iPad: 'tb-ipad', Watch: 'tb-watch' };
+async function loadCatalogo() {
+  try { catData = await fetchSheet(ABAS.catalogo); renderCat(); }
+  catch(e) { document.getElementById('catalogo-content').innerHTML = errorBox('Catalogo'); }
+}
+function renderCat() {
+  const el = document.getElementById('catalogo-content');
+  const items = catData.filter(r => { const matchT = catFiltro === 'todos' || (r.Tipo||'').includes(catFiltro); const matchS = (r.Modelo + r.Armazenamento).toLowerCase().includes(catSearch.toLowerCase()); return matchT && matchS && r.Modelo; });
+  if (!items.length) { el.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;padding:8px 0;">Nenhum item encontrado.</p>'; return; }
+  el.innerHTML = `<div class="cat-grid">${items.map(it => `<div class="cat-card"><div class="cat-card-top"><div><div class="cat-model">${it.Modelo}</div><div class="cat-storage">${it.Armazenamento||''}</div></div><span class="type-badge ${typeClass[it.Tipo]||'tb-iphone'}">${it.Tipo||''}</span></div><div class="cat-price">${it.Preco||''}</div>${it.Cores ? `<div class="cat-row">Cores: <span>${it.Cores}</span></div>` : ''}${it.Obs ? `<div class="cat-row">Obs: <span>${it.Obs}</span></div>` : ''}</div>`).join('')}</div>`;
+}
+function setCatFiltro(f, btn) { catFiltro = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderCat(); }
+function filterCat(v) { catSearch = v; renderCat(); }
+async function loadSemi() {
+  try {
+    const rows = await fetchSheet(ABAS.semi);
+    const tbody = rows.filter(r => r.Modelo).map(r => `<tr><td>${r.Modelo}</td><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">${r.Armazenamento||''}</td><td><span class="val-a">${r.Preco||''}</span></td></tr>`).join('');
+    document.getElementById('semi-content').innerHTML = `<div class="troca-wrap"><table><thead><tr><th>Modelo</th><th>Armazenamento</th><th>Preço de Venda</th></tr></thead><tbody>${tbody}</tbody></table></div>`;
+  } catch(e) { document.getElementById('semi-content').innerHTML = errorBox('Seminovos'); }
+}
+async function loadTroca() {
+  try {
+    const rows = await fetchSheet(ABAS.troca);
+    const tbody = rows.filter(r => r.Modelo).map(r => `<tr><td>${r.Modelo}</td><td><span class="val-a">${r.ValorA||'—'}</span></td><td><span class="val-b">${r.ValorB||'—'}</span></td><td><span class="val-c">${r.ValorC||'—'}</span></td><td class="obs-cell">${r.Obs||''}</td></tr>`).join('');
+    document.getElementById('troca-content').innerHTML = `<div class="troca-wrap"><table><thead><tr><th>Modelo</th><th>Valor A</th><th>Valor B</th><th>Valor C</th><th>Observações</th></tr></thead><tbody>${tbody}</tbody></table></div>`;
+  } catch(e) { document.getElementById('troca-content').innerHTML = errorBox('Troca'); }
+}
+const checklistGroups = [
+  { titulo: '🔐 Conta & Bloqueios', itens: [{ t: 'Sem iCloud ativo (não pede Apple ID)', n: 'Peça para deslogar na frente — ou recuse a troca' },{ t: 'Sem bloqueio de operadora', n: 'Teste com chip da nossa operadora' },{ t: 'IMEI não está na lista negra', n: 'Consultar IMEI antes de fechar' }]},
+  { titulo: '🖥️ Tela & Corpo', itens: [{ t: 'Tela sem manchas, pixeis mortos ou linhas', n: '' },{ t: 'Touch funcionando em toda a extensão', n: 'Deslize e toque nas bordas' },{ t: 'Face ID / Touch ID funcionando', n: 'Testar com face/dedo do cliente' },{ t: 'Carcaça sem trincas ou cantos quebrados', n: '' },{ t: 'Vidro da câmera traseira sem riscos', n: '' }]},
+  { titulo: '🔋 Bateria & Desempenho', itens: [{ t: 'Saúde da bateria acima de 80%', n: 'Configurações → Bateria → Saúde da Bateria' },{ t: 'Aparelho não esquenta anormalmente', n: '' },{ t: 'Botão lateral funcionando', n: '' },{ t: 'Botões de volume funcionando', n: '' }]},
+  { titulo: '📷 Câmera & Áudio', itens: [{ t: 'Câmera traseira: foto e vídeo OK', n: '' },{ t: 'Câmera frontal funciona', n: '' },{ t: 'Flash funcionando', n: '' },{ t: 'Alto-falante com som limpo', n: 'Tocar música no volume máximo' },{ t: 'Microfone funcionando', n: 'Gravar áudio e ouvir' }]},
+  { titulo: '📶 Conectividade', itens: [{ t: 'Sinal de ligação com chip OK', n: 'Fazer ligação de teste' },{ t: 'Wi-Fi conectando e navegando', n: '' },{ t: 'Bluetooth ligando', n: '' },{ t: 'Porta de carregamento OK', n: 'Verificar se carrega' }]},
+  { titulo: '✅ Finalização', itens: [{ t: 'IMEI anotado e conferido', n: 'Discar *#06# ou Configurações → Geral → Informações' },{ t: 'Número de série registrado', n: 'Configurações → Geral → Informações' },{ t: 'Aparelho formatado antes de sair', n: 'Configurações → Geral → Transferir/Redefinir → Apagar tudo' },{ t: 'Cotação passada para o Júnior ✔', n: 'Obrigatório antes de confirmar qualquer troca' }]},
+];
+let clState = {};
+function renderChecklist() {
+  document.getElementById('cl-grid').innerHTML = checklistGroups.map((g, gi) => `<div class="cl-group"><div class="cl-group-title">${g.titulo}</div>${g.itens.map((it, ii) => { const key = `${gi}-${ii}`, done = clState[key]||false; return `<div class="cl-item${done?' done':''}" onclick="toggleCl('${key}')"><div class="cl-box">${done?`<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}</div><div><div class="cl-text">${it.t}</div>${it.n?`<div class="cl-note">${it.n}</div>`:''}</div></div>`; }).join('')}</div>`).join('');
+  updateProgress();
+}
+function toggleCl(key) { clState[key] = !clState[key]; renderChecklist(); }
+function resetChecklist() { clState = {}; renderChecklist(); }
+function updateProgress() { const total = checklistGroups.reduce((a,g) => a+g.itens.length, 0); const done = Object.values(clState).filter(Boolean).length; document.getElementById('prog-fill').style.width = `${(done/total)*100}%`; document.getElementById('prog-label').textContent = `${done} / ${total} verificados`; }
+function showSection(id, el) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); el.classList.add('active'); }
+function errorBox(aba) { return `<div class="error-box">❌ Não foi possível carregar a aba <strong>"${aba}"</strong> do Google Sheets.<br><br>Verifique se:<br>• A planilha está compartilhada como <strong>"Qualquer pessoa com o link → Visualizador"</strong><br>• A aba se chama exatamente <strong>"${aba}"</strong><br>• As colunas têm os nomes corretos</div>`; }
+async function loadAllData() {
+  document.getElementById('sync-status').textContent = 'Sincronizando...';
+  ['catalogo-content','semi-content','troca-content'].forEach(id => document.getElementById(id).innerHTML = '<div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Buscando dados...</div></div>');
+  await Promise.all([loadCatalogo(), loadSemi(), loadTroca()]);
+  const now = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('sync-status').textContent = `Atualizado às ${now}`;
+}
+renderChecklist();
+loadAllData();
+</script>
+</body>
+</html>
